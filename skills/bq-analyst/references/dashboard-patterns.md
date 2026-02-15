@@ -11,8 +11,9 @@ Self-contained HTML/JS dashboard patterns using Chart.js. All dashboards are sin
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Title</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0" integrity="sha384-cVMg8E3QFwTvGCDuK+ET4PD341jF3W8nO1auiXfuZNQkzbUUiBGLsIQUE+b1mxws" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <!-- Only needed for time-axis charts: -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>/* See CSS System below */</style>
 </head>
 <body>
@@ -440,6 +441,25 @@ body {
     .kpi-card { border: 1px solid #dee2e6; box-shadow: none; }
 }
 ```
+
+## Survey Dashboard Pattern
+
+Survey dashboards have a different shape to time-series/revenue dashboards. Typical layout:
+
+**KPI row:** Total respondents, key awareness/satisfaction metric, data quality flag (e.g., straight-liner %)
+
+**Charts:**
+- **Horizontal bar** — awareness/action rates sorted by %, with small-n segments highlighted
+- **Stacked bar (100%)** — Likert distributions across multiple statements, diverging colour scale (red→amber→green)
+- **Grouped bar** — cross-tab comparisons (metric by segment), with base sizes in labels: `"Scotland (n=67)"`
+
+**Data table:** Regional or segment breakdown with all key metrics, small-n rows italicised with ⚠ marker
+
+**Survey-specific tips:**
+- Always show base sizes (n=) — survey readers expect them
+- Exclude off-scale codes (e.g., 6="prefer not to say") from chart data but note the exclusion
+- Highlight statistically significant differences if tested (bold bar, annotation)
+- Use warm-to-cool diverging colours for Likert: `['#C44E52', '#DD8452', '#CCB974', '#55A868', '#4C72B0']` maps to strongly disagree → strongly agree
 
 ## Performance Guidelines
 

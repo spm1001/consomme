@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freeview Signal Coverage by ITV Region</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8; --green: #22c55e; --amber: #f59e0b; --red: #ef4444; --blue: #3b82f6; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 2rem; }
+  h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.875rem; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .kpi { background: var(--card); border-radius: 12px; padding: 1.25rem; }
+  .kpi-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-value { font-size: 2rem; font-weight: 700; margin-top: 0.25rem; }
+  .chart-container { background: var(--card); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+  .chart-title { font-size: 1rem; margin-bottom: 1rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #334155; }
+  th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em; }
+  .good { color: var(--green); } .marginal { color: var(--amber); } .poor { color: var(--red); }
+  @media print { body { background: #fff; color: #000; } .kpi, .chart-container { border: 1px solid #ddd; } }
+</style>
+</head>
+<body>
+<h1>Freeview DTT Signal Coverage</h1>
+<p class="subtitle">By ITV Region · Current predictions ("Now" step) · 44,481 postcodes · Data from freeview.co.uk</p>
+
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-label">Total Postcodes</div><div class="kpi-value">44,481</div></div>
+  <div class="kpi"><div class="kpi-label">Transmitters</div><div class="kpi-value">1,077</div></div>
+  <div class="kpi"><div class="kpi-label">Avg Served Score</div><div class="kpi-value">60.7</div></div>
+  <div class="kpi"><div class="kpi-label">Best Region</div><div class="kpi-value" style="font-size:1.25rem">Tyne Tees (76.4)</div></div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Average Signal Quality by ITV Region</div>
+  <canvas id="barChart" height="100"></canvas>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Signal Quality Breakdown (%)</div>
+  <canvas id="stackedChart" height="100"></canvas>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Detailed Results</div>
+  <table>
+    <thead><tr><th>ITV Area</th><th>Postcodes</th><th>Avg Served</th><th>Avg Marginal</th><th>Good %</th><th>Marginal %</th><th>Poor %</th></tr></thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<script>
+const data = [
+  {area:'Tyne Tees',postcodes:2069,served:76.4,marginal:85.2,good:71.7,marg:12.1,poor:16.2},
+  {area:'Scotland',postcodes:4118,served:76.1,marginal:81.2,good:71.2,marg:7.3,poor:21.5},
+  {area:'Border',postcodes:666,served:73.9,marginal:84.3,good:68.7,marg:12.8,poor:18.6},
+  {area:'Yorkshire',postcodes:4457,served:68.3,marginal:79.7,good:62.1,marg:15.1,poor:22.8},
+  {area:'Wales',postcodes:2429,served:68.3,marginal:79.7,good:62.2,marg:15.0,poor:22.8},
+  {area:'West',postcodes:1722,served:67.4,marginal:79.9,good:59.7,marg:17.3,poor:23.0},
+  {area:'Granada',postcodes:6380,served:66.3,marginal:80.0,good:58.8,marg:17.4,poor:23.8},
+  {area:'Westcountry',postcodes:1481,served:59.7,marginal:78.3,good:53.1,marg:22.8,poor:24.1},
+  {area:'Midlands',postcodes:5176,served:59.4,marginal:73.9,good:51.8,marg:18.9,poor:29.2},
+  {area:'London',postcodes:7824,served:55.5,marginal:68.7,good:48.7,marg:16.5,poor:34.9},
+  {area:'Meridian',postcodes:5009,served:50.3,marginal:73.3,good:41.9,marg:28.5,poor:29.6},
+  {area:'Anglia',postcodes:3150,served:44.9,marginal:73.1,good:35.7,marg:34.3,poor:30.1}
+];
+
+const labels = data.map(d => d.area);
+
+new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Avg Served', data: data.map(d => d.served), backgroundColor: '#3b82f6' },
+      { label: 'Avg Marginal', data: data.map(d => d.marginal), backgroundColor: '#3b82f680' }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: { y: { beginAtZero: true, max: 100, ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }, x: { ticks: { color: '#94a3b8' }, grid: { display: false } } },
+    plugins: { legend: { labels: { color: '#f1f5f9' } } }
+  }
+});
+
+new Chart(document.getElementById('stackedChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Good (≥70)', data: data.map(d => d.good), backgroundColor: '#22c55e' },
+      { label: 'Marginal', data: data.map(d => d.marg), backgroundColor: '#f59e0b' },
+      { label: 'Poor', data: data.map(d => d.poor), backgroundColor: '#ef4444' }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: { y: { stacked: true, max: 100, ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }, x: { stacked: true, ticks: { color: '#94a3b8' }, grid: { display: false } } },
+    plugins: { legend: { labels: { color: '#f1f5f9' } } }
+  }
+});
+
+const tbody = document.getElementById('tableBody');
+data.forEach(d => {
+  tbody.innerHTML += `<tr>
+    <td>${d.area}</td><td>${d.postcodes.toLocaleString()}</td>
+    <td>${d.served}</td><td>${d.marginal}</td>
+    <td class="good">${d.good}%</td><td class="marginal">${d.marg}%</td><td class="poor">${d.poor}%</td>
+  </tr>`;
+});
+</script>
+</body>
+</html>

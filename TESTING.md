@@ -124,4 +124,138 @@ python3 ~/.claude/skills/skill-forge/scripts/lint_skill.py skills/bq-analyst
 python3 ~/.claude/skills/skill-forge/scripts/score_description.py skills/bq-analyst
 ```
 
-Current scores: Lint 90/100, CSO 77/100.
+Current scores: Lint 99/100, CSO 79/100.
+
+## 6. Round 1 — SQL Validation (PASSED ✅)
+
+All SQL snippets from `statistical-analysis.md` and `profiling-survey.md` run correctly against real survey data in `mit-consomme-test.survey_data.ohid_survey_raw` (1,320 rows, 39 cols).
+
+Patterns tested and verified:
+- Likert distribution with percentage
+- Cross-tabulation with `HAVING COUNT(*) >= 30`
+- Confidence intervals by group
+- Z-test for proportions
+- Chi-squared test for independence
+- IQR outlier detection
+
+## 7. Round 2 — Skill Workflow Testing (PASSED ✅)
+
+### Test 2.1: Data Shape Detection ✅
+
+Followed Section 3 heuristics against `ohid_survey_raw`:
+
+| Signal | Expected | Actual | Match |
+|--------|----------|--------|-------|
+| Single table in dataset | Survey signal | ✅ 1 table | ✅ |
+| Wide table, many columns | Survey signal | ✅ 39 cols, 1,320 rows | ✅ |
+| Column names are question codes | Survey signal | ✅ S0-S3, Q1r1-Q1r12, Q2r1-Q2r5, etc. | ✅ |
+| No FK relationships | Survey signal | ✅ Self-contained | ✅ |
+
+**Verdict:** All three heuristic rows in the detection table fire correctly. An agent following the skill would identify this as survey data and route to `profiling-survey.md`.
+
+### Test 2.2: Survey Profiling Flow ✅
+
+Followed `profiling-survey.md` phases against real data:
+
+**Phase 1 (Structural Understanding):**
+- 1,320 respondents, 1,320 unique RIDs, 100% consented
+- Respondent ID: `RID` (STRING, UUID format)
+- Demographics: S1 (age, 5 values: 2-6), S2 (gender, 4 values), S3 (region, 10 values)
+- No age code 1 (<18) or 7 (65+) in data — these brackets were screened out
+
+**Phase 2 (Column-Level):**
+- Likert Q2r1 distribution: strongly positive skew (44% score 5, 34.6% score 4, only 1.1% "prefer not to say")
+- Zero null rates across all question columns — complete responses
+- All SQL patterns from the reference worked as-is
+
+**Phase 3 (Cross-Tabulation):**
+- Brand awareness by region with `HAVING n >= 30`: correctly excluded Northern Ireland (n=7)
+- Scotland (n=67) lowest at 32.8% vs Midlands highest at 53.4%
+
+**Quality Assessment:**
+- Straight-lining detected: 410 respondents (31.1%) gave identical scores across all 5 Q2 Likert items
+- The skill's straight-lining detection SQL pattern worked correctly
+- ⚠ **Finding:** 31% straight-liners is high — worth flagging in any real analysis
+
+### Test 2.3: analyze_contribution ✅
+
+Tested: "Why is brand awareness lower in Scotland?"
+
+- Input: Scotland (region 7) as test vs regions 3,4,5 as control
+- Metric: `SUM(aware_of_emm)` (Q3r1)
+- Dimensions: `age_group`, `gender`
+- Tool ran successfully, returned 20 ranked contributors
+- Top insight: overall difference = -280 (22 vs 302), -92.7% relative difference
+- Gender=2 (female) is the largest dimensional contributor (225 absolute contribution)
+- Age_group=4 (35-44) second largest contributor
+
+**Verdict:** The tool works well for survey cross-group comparison. The skill's recipe in Section 2 (the `analyze_contribution` example) maps correctly to this use case.
+
+### Test 2.4: Chart.js Dashboard ✅
+
+Built a self-contained HTML dashboard at `test-outputs/ohid-survey-dashboard.html` following `dashboard-patterns.md`:
+
+- 308 lines, 3 Chart.js charts + KPI row + data table
+- Used the base template structure, CSS system, bar chart patterns
+- KPI cards: respondents, EMM awareness, avg attitude score, straight-liner warning
+- Chart 1: Brand awareness by region (horizontal bar, Scotland highlighted red)
+- Chart 2: Actions taken for wellbeing (horizontal bar, sorted)
+- Chart 3: Likert distribution (stacked bar, all 5 Q2 statements)
+- Regional breakdown data table with small-n warnings
+
+**Verdict:** The dashboard-patterns.md reference provides sufficient patterns and CSS to build a complete dashboard. No gaps found.
+
+### Observations / Potential Skill Improvements
+
+1. **Straight-liner threshold:** profiling-survey.md detects straight-liners but doesn't suggest what threshold warrants concern (e.g., >10% is high, >20% is a red flag). The 31.1% here is very high.
+
+2. **Encoded survey data:** The profiling-survey.md multi-select pattern assumes comma-separated values, but this survey uses binary 0/1 columns (Q1r1-Q1r12, Q3r1-Q3r6, Q5r1-Q5r6). Both encodings are common. The reference should mention the binary-column pattern and how to profile it (SUM each column).
+
+3. **"Prefer not to say" handling:** Q2 Likert scale has 6 = "prefer not to say". The reference mentions filtering scale responses but doesn't explicitly call out this common survey pattern. Worth adding: "Watch for off-scale codes (e.g., 6='prefer not to say' on a 1-5 scale) — exclude from mean/median calculations."
+
+4. **analyze_contribution with survey data:** Works well but requires careful framing — the "metric" for binary 0/1 survey responses is `SUM(column)` which gives total count of 1s. Worth noting in the tool recipe.
+
+5. **Northern Ireland small sample:** The `HAVING n >= 30` filter correctly excluded NI (n=7) from statistical comparisons, validating the skill's guidance.
+
+### Test 2.5: search_catalog ✅
+
+Searched with natural language prompt: "mental health survey questionnaire responses"
+- Found both the table (`ohid_survey_raw`) and dataset (`survey_data`)
+- Confirms semantic search works without knowing exact table names
+
+### Bugs Found and Fixed
+
+**SRI hash bug in dashboard-patterns.md:** The Chart.js `<script>` tags had fabricated `integrity` hashes. Chrome silently refused to load the scripts, producing a blank page. Fixed: removed SRI attributes, switched to explicit `/dist/chart.umd.min.js` paths. Also fixed in the generated test dashboard.
+
+### Skill Improvements Applied (Round 2)
+
+| Change | File | What |
+|--------|------|------|
+| Datamap/codebook section | `profiling-survey.md` | Where to find datamaps, CASE pattern for decoding, "don't guess codes" |
+| Cross-reference to stats | `profiling-survey.md` | Link to `statistical-analysis.md` after cross-tab section |
+| Binary multi-select pattern | `profiling-survey.md` | SUM-each-column pattern alongside comma-separated |
+| Off-scale codes | `profiling-survey.md` | Guidance on "prefer not to say" values outside Likert range |
+| Straight-liner thresholds | `profiling-survey.md` | <10% typical, 10-20% note, >20% red flag |
+| Survey note for analyze_contribution | `SKILL.md` | SUM(binary_col) tip + cast dimensions to STRING |
+| Anti-patterns section | `SKILL.md` | 10-row table — pushed lint from 99 to 100 |
+| Survey dashboard pattern | `dashboard-patterns.md` | Layout guide, Likert colour scale, base-size conventions |
+| Fix CDN script tags | `dashboard-patterns.md` | Removed bogus SRI hashes |
+
+### Post-Round 2 Scores
+
+- Lint: **100/100** (was 99 — anti-patterns section added)
+- CSO: **79/100** (unchanged — timing_gates and action_verbs hold it back)
+- SKILL.md: **352 lines** (under 500 limit)
+
+## 8. Round 3 — Time Series & Forecast (pending)
+
+Needs time-series data to test:
+- `forecast` tool with real temporal data
+- `profiling-timeseries.md` gap detection, grain detection, seasonality checks
+- `profiling-warehouse.md` multi-table FK/star-schema profiling
+
+Options: synthetic daily metrics table, or find a public BQ dataset with time series.
+
+## 9. Round 4 — Claude Code Platform Parity (pending)
+
+Test in Claude Code for platform parity with Amp.
