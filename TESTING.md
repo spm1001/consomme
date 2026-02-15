@@ -10,11 +10,11 @@
 ./install.sh --verify
 
 # Check both locations
-ls -la ~/.gemini/skills/bq-analyst
-ls -la ~/.claude/skills/bq-analyst
+ls -la ~/.gemini/skills/consomme
+ls -la ~/.claude/skills/consomme
 ```
 
-✅ Both symlinks point to `skills/bq-analyst` in this repo.
+✅ Both symlinks point to `skills/consomme` in this repo.
 
 ## 2. Skill loads in agent
 
@@ -24,7 +24,7 @@ ls -la ~/.claude/skills/bq-analyst
 gemini skills list
 ```
 
-✅ `bq-analyst` appears in the list.
+✅ `consomme` appears in the list.
 
 ### Claude Code / Amp
 
@@ -32,7 +32,7 @@ Start a new session in any project. The skill should appear in available skills.
 
 > "What skills do you have for BigQuery?"
 
-✅ Agent mentions bq-analyst skill.
+✅ Agent mentions consomme skill.
 
 ## 3. End-to-end with BigQuery
 
@@ -118,10 +118,10 @@ Run these in Gemini CLI, one at a time. Each tests a different stage of the work
 
 ```bash
 # Structure lint (target: 85+)
-python3 ~/.claude/skills/skill-forge/scripts/lint_skill.py skills/bq-analyst
+python3 ~/.claude/skills/skill-forge/scripts/lint_skill.py skills/consomme
 
 # Description quality (target: 70+)
-python3 ~/.claude/skills/skill-forge/scripts/score_description.py skills/bq-analyst
+python3 ~/.claude/skills/skill-forge/scripts/score_description.py skills/consomme
 ```
 
 Current scores: Lint 99/100, CSO 79/100.

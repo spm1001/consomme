@@ -26,7 +26,7 @@ Stripped to BigQuery-only. Works in both Gemini CLI (`~/.gemini/skills/`) and Cl
 ## Target Structure
 
 ```
-skills/bq-analyst/SKILL.md    ← The Franken-Skill (~500-600 lines)
+skills/consomme/SKILL.md    ← The Franken-Skill (~500-600 lines)
 install.sh                     ← Symlinks into ~/.gemini/skills/ and/or ~/.claude/skills/
 README.md                      ← Already written
 ```
@@ -35,7 +35,7 @@ README.md                      ← Already written
 
 ### Frontmatter
 ```yaml
-name: bq-analyst
+name: consomme
 description: BigQuery data analysis — exploration, SQL craft, validation, and visualization. Assumes BQ Data Analytics extension is installed for MCP tools (execute_sql, forecast, analyze_contribution, catalog search). Use when analysing data, writing queries, exploring datasets, or building dashboards from BigQuery data.
 ```
 
@@ -70,7 +70,7 @@ description: BigQuery data analysis — exploration, SQL craft, validation, and 
 
 Simple symlinker, same pattern as trousse's install.sh:
 - Detect whether ~/.gemini/skills/ and/or ~/.claude/skills/ exist
-- Create symlink for bq-analyst skill directory
+- Create symlink for consomme skill directory
 - Print confirmation
 
 ## Verification
