@@ -8,8 +8,8 @@ BigQuery data analysis skill for AI coding agents. Takes messy data and produces
 > **Requires:** Python 3.11+, GCP project with BigQuery API
 
 Combines:
-- **Google's BQ Data Analytics extension** — MCP tools for direct BigQuery connectivity (`execute_sql`, `forecast`, `analyze_contribution`, catalog search)
-- **Anthropic's data plugin methodology** — systematic approaches to data exploration, SQL craft, validation, and visualization — stripped to BQ-only
+- **[Google's BQ Data Analytics extension](https://github.com/gemini-cli-extensions/bigquery-data-analytics)** — MCP tools for direct BigQuery connectivity (`execute_sql`, `forecast`, `analyze_contribution`, catalog search)
+- **[Anthropic's data analysis skill](https://github.com/anthropics/skills/tree/main/skills/data-analysis)** — systematic approaches to data exploration, SQL craft, validation, and visualization — stripped to BQ-only
 
 Works with both **Gemini CLI** and **Claude Code**.
 
