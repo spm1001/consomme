@@ -68,13 +68,9 @@ advertiser-analysis/
 └── .gemini/settings.json  ← BQ extension config (auto-created on install)
 ```
 
-## Naming
+## The Kitchen
 
-Part of the [trousse](https://github.com/spm1001/trousse) ecosystem:
-- **trousse** — the toolkit
-- **mise** (en place) — the prep
-- **garde** (manger) — the cold store
-- **consommé** — the clarification
+Consommé is part of [Batterie de Savoir](https://spm1001.github.io/batterie-de-savoir/) — a suite of tools for AI-assisted knowledge work, each named for a station in a professional kitchen brigade. See the [full brigade and design principles](https://spm1001.github.io/batterie-de-savoir/) for how the tools fit together.
 
 ## License
 
