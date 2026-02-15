@@ -2,10 +2,12 @@
 
 BigQuery data analysis skill for AI coding agents. Takes messy data and produces crystal-clear insights — the technique does the work, not the person.
 
-> **Status:** Beta — actively developed
-> **Works with:** Claude Code, Gemini CLI
-> **Install:** Clone + symlink skill
-> **Requires:** Python 3.11+, GCP project with BigQuery API
+## Status
+
+**Robustness:** Beta — actively developed
+**Works with:** Claude Code, Gemini CLI
+**Install:** Clone + symlink skill
+**Requires:** Python 3.11+, GCP project with BigQuery API
 
 Combines:
 - **[Google's BQ Data Analytics extension](https://github.com/gemini-cli-extensions/bigquery-data-analytics)** — MCP tools for direct BigQuery connectivity (`execute_sql`, `forecast`, `analyze_contribution`, catalog search)
