@@ -220,3 +220,34 @@ WITH ranked AS (
 )
 SELECT * FROM ranked WHERE rn = 1
 ```
+
+### External Tables (Google Sheets → BigQuery)
+
+Link a Google Sheet as a queryable BQ table. Data stays in the Sheet — BQ reads it live on every query.
+
+```sql
+-- Create external table from a Google Sheet
+CREATE EXTERNAL TABLE `project.dataset.table_name`
+OPTIONS (
+    format = 'GOOGLE_SHEETS',
+    uris = ['https://docs.google.com/spreadsheets/d/SHEET_ID'],
+    skip_leading_rows = 1
+);
+
+-- Target a specific tab by name
+CREATE EXTERNAL TABLE `project.dataset.table_name`
+OPTIONS (
+    format = 'GOOGLE_SHEETS',
+    uris = ['https://docs.google.com/spreadsheets/d/SHEET_ID'],
+    sheet_range = 'Sheet2!A:Z',
+    skip_leading_rows = 1
+);
+```
+
+**Permissions (double-lock):** Users need both BQ access (`roles/bigquery.dataViewer` + `roles/bigquery.user` on the project) AND the Google Sheet shared with their Google account. Missing either lock = query fails.
+
+**Gotchas:**
+- BQ auto-detects column types from Sheet data — messy columns become STRING
+- Schema changes in the Sheet (adding/removing columns) can break queries
+- Performance is slower than native BQ tables — fine for small datasets, avoid for >100K rows
+- Use `CREATE OR REPLACE EXTERNAL TABLE` to update the link without dropping first
