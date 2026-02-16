@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 # consommé installer
-# Symlinks skills into ~/.gemini/skills/ and ~/.claude/skills/
+# - Symlinks skills into ~/.claude/skills/ (Claude Code / Amp)
+# - Links as Gemini CLI extension (Gemini)
 #
 
 set -euo pipefail
@@ -20,8 +21,8 @@ error() { echo -e "${RED}✗${NC} $1"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Target directories
-TARGETS=("$HOME/.gemini/skills" "$HOME/.claude/skills")
+# Target directory for skill symlinks (Claude Code / Amp only)
+SKILL_TARGETS=("$HOME/.claude/skills")
 
 # Parse arguments
 DRY_RUN=false
@@ -33,11 +34,15 @@ show_help() {
     echo ""
     echo "Usage: ./install.sh [OPTIONS]"
     echo ""
+    echo "Installs consomme for Claude Code, Amp, and Gemini CLI:"
+    echo "  - Claude Code / Amp: symlinks skill into ~/.claude/skills/"
+    echo "  - Gemini CLI: links repo as extension via 'gemini extensions link'"
+    echo ""
     echo "Options:"
     echo "  --help      Show this help message"
     echo "  --dry-run   Preview what would be installed (no changes)"
     echo "  --verify    Check existing installation"
-    echo "  --uninstall Remove symlinks created by this installer"
+    echo "  --uninstall Remove symlinks and extension link"
     echo ""
 }
 
@@ -60,7 +65,8 @@ if [[ "$UNINSTALL" == true ]]; then
     echo "========================"
     echo ""
 
-    for target_dir in "${TARGETS[@]}"; do
+    # Remove skill symlinks
+    for target_dir in "${SKILL_TARGETS[@]}"; do
         info "Checking ${target_dir/#$HOME/\~}..."
         REMOVED=0
         for link in "$target_dir"/*/; do
@@ -77,6 +83,30 @@ if [[ "$UNINSTALL" == true ]]; then
         done
         ok "Removed $REMOVED symlinks from ${target_dir/#$HOME/\~}"
     done
+
+    # Remove legacy Gemini skill symlink if present
+    GEMINI_SKILL_LINK="$HOME/.gemini/skills/consomme"
+    if [[ -L "$GEMINI_SKILL_LINK" ]]; then
+        if [[ "$DRY_RUN" == true ]]; then
+            echo "  Would remove legacy Gemini skill symlink: ${GEMINI_SKILL_LINK/#$HOME/\~}"
+        else
+            rm "$GEMINI_SKILL_LINK"
+        fi
+        ok "Removed legacy Gemini skill symlink"
+    fi
+
+    # Unlink Gemini extension
+    if command -v gemini &>/dev/null; then
+        info "Unlinking Gemini extension..."
+        if [[ "$DRY_RUN" == true ]]; then
+            echo "  Would run: gemini extensions uninstall consomme"
+        else
+            gemini extensions uninstall consomme 2>/dev/null && \
+                ok "Gemini extension unlinked" || \
+                warn "Gemini extension was not linked"
+        fi
+    fi
+
     echo ""
     exit 0
 fi
@@ -91,7 +121,9 @@ if [[ "$VERIFY_ONLY" == true ]]; then
     echo ""
 
     ERRORS=0
-    for target_dir in "${TARGETS[@]}"; do
+
+    # Check Claude Code / Amp skill symlinks
+    for target_dir in "${SKILL_TARGETS[@]}"; do
         info "Checking ${target_dir/#$HOME/\~}..."
         if [[ ! -d "$target_dir" ]]; then
             echo "  – directory does not exist"
@@ -116,6 +148,30 @@ if [[ "$VERIFY_ONLY" == true ]]; then
         done
     done
 
+    # Check Gemini extension
+    info "Checking Gemini extension..."
+    EXT_LINK="$HOME/.gemini/extensions/consomme"
+    if [[ -L "$EXT_LINK" ]]; then
+        if [[ -d "$EXT_LINK" ]]; then
+            echo "  ✓ Gemini extension (linked)"
+        else
+            echo "  ✗ Gemini extension (broken symlink)"
+            ERRORS=$((ERRORS + 1))
+        fi
+    elif [[ -d "$EXT_LINK" ]]; then
+        echo "  ✓ Gemini extension (installed)"
+    else
+        echo "  ✗ Gemini extension (not linked)"
+        ERRORS=$((ERRORS + 1))
+    fi
+
+    # Warn about legacy Gemini skill symlink
+    GEMINI_SKILL_LINK="$HOME/.gemini/skills/consomme"
+    if [[ -L "$GEMINI_SKILL_LINK" ]]; then
+        warn "Legacy Gemini skill symlink exists at ${GEMINI_SKILL_LINK/#$HOME/\~}"
+        echo "    This may cause double-loading. Run install to clean up."
+    fi
+
     echo ""
     if [[ $ERRORS -eq 0 ]]; then
         ok "All checks passed!"
@@ -139,33 +195,27 @@ if [[ "$DRY_RUN" == true ]]; then
     echo ""
 fi
 
-# Check which target directories exist
+# --- Claude Code / Amp: skill symlinks ---
+
 ACTIVE_TARGETS=()
-MISSING_TARGETS=()
-for target_dir in "${TARGETS[@]}"; do
+for target_dir in "${SKILL_TARGETS[@]}"; do
     if [[ -d "$target_dir" ]]; then
         ACTIVE_TARGETS+=("$target_dir")
-    else
-        MISSING_TARGETS+=("$target_dir")
     fi
 done
 
 if [[ ${#ACTIVE_TARGETS[@]} -eq 0 ]]; then
-    warn "Neither ~/.gemini/skills/ nor ~/.claude/skills/ exists"
-    info "Creating both directories..."
+    info "Creating ~/.claude/skills/..."
     if [[ "$DRY_RUN" != true ]]; then
-        for target_dir in "${TARGETS[@]}"; do
-            mkdir -p "$target_dir"
-        done
+        mkdir -p "$HOME/.claude/skills"
     fi
-    ACTIVE_TARGETS=("${TARGETS[@]}")
+    ACTIVE_TARGETS=("$HOME/.claude/skills")
 fi
 
-# Symlink skills into each active target
 INSTALLED=()
 for target_dir in "${ACTIVE_TARGETS[@]}"; do
     short_dir="${target_dir/#$HOME/\~}"
-    info "Installing to $short_dir..."
+    info "Installing skill to $short_dir..."
 
     for skill_dir in "$SCRIPT_DIR"/skills/*/; do
         skill_name=$(basename "$skill_dir")
@@ -190,6 +240,55 @@ for target_dir in "${ACTIVE_TARGETS[@]}"; do
         fi
     done
 done
+
+# --- Clean up legacy Gemini skill symlink ---
+
+GEMINI_SKILL_LINK="$HOME/.gemini/skills/consomme"
+if [[ -L "$GEMINI_SKILL_LINK" ]]; then
+    info "Removing legacy Gemini skill symlink (replaced by extension)..."
+    if [[ "$DRY_RUN" != true ]]; then
+        rm "$GEMINI_SKILL_LINK"
+    fi
+    ok "Removed ${GEMINI_SKILL_LINK/#$HOME/\~}"
+fi
+
+# --- Gemini CLI: extension link ---
+
+if command -v gemini &>/dev/null; then
+    echo ""
+    EXT_DIR="$HOME/.gemini/extensions/consomme"
+
+    if [[ -L "$EXT_DIR" ]] && [[ "$(readlink "$EXT_DIR")" == "$SCRIPT_DIR" ]]; then
+        ok "Gemini extension already linked"
+    else
+        info "Linking Gemini extension..."
+        if [[ "$DRY_RUN" != true ]]; then
+            # Create symlink directly — 'gemini extensions link' requires
+            # interactive input for settings which can't be piped
+            mkdir -p "$HOME/.gemini/extensions"
+            [[ -e "$EXT_DIR" ]] && rm -rf "$EXT_DIR"
+            ln -s "$SCRIPT_DIR" "$EXT_DIR"
+
+            # Create .env for settings if not present
+            if [[ ! -f "$SCRIPT_DIR/.env" ]]; then
+                echo "BIGQUERY_PROJECT=" > "$SCRIPT_DIR/.env"
+                warn "Set your project in .env: echo 'BIGQUERY_PROJECT=your-project' > $SCRIPT_DIR/.env"
+            fi
+            ok "Gemini extension linked"
+        else
+            echo "  Would symlink: $EXT_DIR → $SCRIPT_DIR"
+        fi
+    fi
+    INSTALLED+=("Gemini extension → ~/.gemini/extensions/consomme")
+
+    echo ""
+    warn "BQ tools require the Google BQ Data Analytics extension:"
+    echo "  gemini extensions install googlecloudplatform/bq-data-analytics"
+else
+    echo ""
+    warn "Gemini CLI not found — skipping extension link"
+    echo "  Install: https://github.com/google-gemini/gemini-cli"
+fi
 
 # Summary
 echo ""

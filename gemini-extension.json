@@ -1,0 +1,13 @@
+{
+  "name": "consomme",
+  "version": "0.1.0",
+  "description": "BigQuery data analysis methodology — systematic profiling, validation, and visualization. Pairs with the Google BQ Data Analytics extension for tools.",
+  "contextFileName": "CONSOMME.md",
+  "settings": [
+    {
+      "name": "BigQuery Project",
+      "description": "Default GCP project ID for BigQuery queries",
+      "envVar": "BIGQUERY_PROJECT"
+    }
+  ]
+}
