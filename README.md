@@ -5,9 +5,9 @@ BigQuery data analysis skill for AI coding agents. Takes messy data and produces
 ## Status
 
 **Robustness:** Beta — actively developed
-**Works with:** Claude Code, Gemini CLI
-**Install:** Clone + symlink skill
-**Requires:** Python 3.11+, GCP project with BigQuery API
+**Works with:** Claude Code, Gemini CLI, Amp
+**Install:** `gemini extensions install` (Gemini) or `./install.sh` (Claude Code / Amp)
+**Requires:** GCP project with BigQuery API (or just a Google Sheet for light analysis)
 
 Combines:
 - **[Google's BQ Data Analytics extension](https://github.com/gemini-cli-extensions/bigquery-data-analytics)** — MCP tools for direct BigQuery connectivity (`execute_sql`, `forecast`, `analyze_contribution`, catalog search)
@@ -15,39 +15,39 @@ Combines:
 
 Works with both **Gemini CLI** and **Claude Code**.
 
-## Prerequisites
+## Install
+
+### Gemini CLI (one command)
+
+```bash
+gemini extensions install https://github.com/spm1001/consomme
+```
+
+You'll be prompted for your BigQuery Project ID. Then install the BQ tools extension:
+
+```bash
+gemini extensions install https://github.com/gemini-cli-extensions/bigquery-data-analytics
+```
+
+Commands available immediately: `/consomme`, `/consomme-profile`, `/consomme-explore`, `/consomme-dashboard`, `/consomme-validate`, `/consomme-sheets`, `/consomme-ingest`.
+
+### Claude Code / Amp
+
+```bash
+git clone https://github.com/spm1001/consomme.git
+cd consomme && ./install.sh
+```
+
+Requires a BQ MCP server configured separately (ADC or service account).
+
+### No BigQuery? No problem.
+
+`/consomme-sheets <google-sheet-url>` analyses Google Sheets directly — no BQ access needed. Works for datasets up to ~5K rows. Requires the [mise](https://github.com/spm1001/mise-en-space) MCP server for Sheet fetching.
+
+## Prerequisites (for BigQuery features)
 
 - A GCP project with BigQuery API enabled
 - Your Google account granted `roles/bigquery.user` on the project
-
-### For Gemini CLI users
-
-```bash
-# 1. Sign in to Gemini CLI (browser-based, no gcloud needed)
-gemini auth login
-
-# 2. Install the BQ extension (provides MCP tools)
-gemini extensions install https://github.com/gemini-cli-extensions/bigquery-data-analytics
-
-# 3. Configure the extension
-gemini extensions config bigquery-data-analytics
-#    → Set Project ID to your GCP project
-#    → useClientOAuth is enabled automatically — the extension
-#      piggybacks on your Gemini CLI sign-in for BigQuery access
-
-# 4. Install consommé skill
-./install.sh
-```
-
-### For Claude Code users
-
-```bash
-# 1. Configure a BQ MCP server in your settings
-#    (requires a separate BigQuery MCP server + ADC or service account)
-
-# 2. Install consommé skill
-./install.sh
-```
 
 ## What you get
 

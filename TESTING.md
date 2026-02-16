@@ -3,18 +3,19 @@
 ## 1. Installation (no BQ needed)
 
 ```bash
-# Install
+# Install (Claude Code / Amp skill + Gemini extension)
 ./install.sh
 
-# Verify symlinks
+# Verify
 ./install.sh --verify
 
-# Check both locations
-ls -la ~/.gemini/skills/consomme
-ls -la ~/.claude/skills/consomme
+# Check locations
+ls -la ~/.claude/skills/consomme          # CC / Amp skill symlink
+ls -la ~/.gemini/extensions/consomme      # Gemini extension (symlink for dev, copy for install)
 ```
 
-✅ Both symlinks point to `skills/consomme` in this repo.
+✅ Claude Code skill symlink points to `skills/consomme` in this repo.
+✅ Gemini extension linked/installed at `~/.gemini/extensions/consomme`.
 
 ## 2. Skill loads in agent
 
