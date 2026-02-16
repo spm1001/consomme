@@ -16,9 +16,12 @@ Systematic methodology for exploring, querying, validating, and visualizing BigQ
 - Building interactive HTML dashboards from query results
 - Validating an analysis before sharing with stakeholders
 
+## Small Datasets Without BigQuery
+
+For Google Sheets under ~5K rows, use `/consomme-sheets <url>` to analyse directly in-context — no BigQuery access needed. The same profiling methodology applies (shape detection, quality assessment, distributions) but execution happens over the CSV data rather than via SQL. Requires the mise MCP server for Sheet fetching.
+
 ## When NOT to Use
 
-- Data is not in BigQuery (different warehouse, local CSV, etc.)
 - User is writing application code that happens to query BQ (they need a client library, not an analysis skill)
 - Pure infrastructure tasks (creating datasets, managing IAM) — use GCP console or CLI directly
 

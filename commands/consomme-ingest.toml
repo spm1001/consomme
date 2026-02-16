@@ -3,6 +3,8 @@ description = "Turn a Google Sheet into a queryable BigQuery table — paste a U
 prompt = """
 The user wants to make a Google Sheet available as a BigQuery table: {{args}}
 
+TRIAGE FIRST: If the user just wants to explore a small Sheet (<5K rows) and doesn't need BigQuery specifically, suggest /consomme-sheets instead — it analyses directly with no BQ permissions needed. Only proceed with BQ ingestion if they need persistent querying, joins with other BQ data, or the dataset is large.
+
 Guide them through this step by step:
 
 1. EXTRACT the Sheet ID from the URL. If they pasted a full URL like https://docs.google.com/spreadsheets/d/ABC123/edit#gid=0, the ID is ABC123.
