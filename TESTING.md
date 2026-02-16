@@ -247,7 +247,78 @@ Searched with natural language prompt: "mental health survey questionnaire respo
 - CSO: **79/100** (unchanged — timing_gates and action_verbs hold it back)
 - SKILL.md: **352 lines** (under 500 limit)
 
-## 8. Round 3 — Time Series & Forecast (pending)
+## 8. Gemini CLI Extension Testing (PASSED ✅)
+
+Tested the Gemini CLI extension scaffold (commit c2c4d7c) on Gemini CLI 0.28.2.
+
+### 8.1: Extension Discovery ✅
+
+```bash
+gemini extensions list
+```
+
+- Extension recognised: `consomme (0.1.0)`
+- Context file detected: `CONSOMME.md`
+- Agent skill discovered: `consomme` (from `skills/consomme/SKILL.md`)
+- Settings captured: `BIGQUERY_PROJECT=mit-consomme-test` (from `.env`)
+
+### 8.2: @import Resolution ✅
+
+Asked Gemini: "What are the five stages of the consomme workflow? What does the SQL reference say about ILIKE?"
+
+- Correctly identified: Discover, Understand, Analyze, Validate, Present
+- Correctly cited SQL reference: BigQuery has no `ILIKE`, use `LOWER(col) LIKE` instead
+- **Confirms:** CONSOMME.md's `@./skills/consomme/SKILL.md` and all 6 `@./skills/consomme/references/*.md` imports resolve correctly
+
+### 8.3: Command Discovery ✅
+
+All four namespaced commands appeared in Gemini's command listing:
+
+| Command | Description |
+|---------|-------------|
+| `/consomme-dashboard` | Build a Chart.js HTML dashboard from BigQuery data |
+| `/consomme-explore` | Explore a BigQuery project or dataset — list tables, catalog search |
+| `/consomme-profile` | Profile a BigQuery table — schema, shape detection, quality assessment |
+| `/consomme-validate` | Run QA checklist against the current analysis |
+
+### 8.4: /consomme-profile Command ✅
+
+Ran `/consomme-profile mit-consomme-test.survey_data.ohid_survey_raw` — Gemini correctly:
+
+- Detected **survey shape** from column patterns (question codes, wide table)
+- Applied **survey profiling methodology** from the reference
+- Generated Likert distribution SQL with `COUNTIF`, top-2-box scoring
+- Generated multi-select binary profiling using `UNPIVOT`
+- Generated straight-liner detection SQL matching `profiling-survey.md` pattern
+- Correctly used the datamap (knew about `qtime` placeholder `999999`)
+- Applied `HAVING COUNT(*) >= 30` for small-sample filtering
+
+**Note:** BQ tool calls failed because the Google BQ Data Analytics extension was not installed — Gemini fell back to generating SQL with explanations. This is the expected behaviour when the tool dependency is missing. The methodology layer worked correctly regardless.
+
+### 8.5: Install Flow ✅
+
+Tested `install.sh` changes:
+
+- `--dry-run`: correctly shows skill symlink to `~/.claude/skills` only (not `~/.gemini/skills`), detects and would remove legacy Gemini skill symlink, shows extension link step
+- `--verify`: checks both Claude skill symlink and Gemini extension link, warns about legacy symlinks
+- Legacy `~/.gemini/skills/consomme` symlink removed (replaced by extension at `~/.gemini/extensions/consomme`)
+
+### Assumptions Verified
+
+| # | Assumption | Result |
+|---|-----------|--------|
+| 1 | `@./path` imports resolve relative to CONSOMME.md | ✅ All 7 imports resolved |
+| 2 | Commands in `commands/` directory are discovered | ✅ All 4 commands listed |
+| 3 | Settings from `.env` are available | ✅ `BIGQUERY_PROJECT` shown in `extensions list` |
+| 4 | Extension + skill don't conflict | ✅ Legacy skill symlink removed; extension subsumes it |
+
+### Not Yet Tested
+
+- `gemini extensions install <github-url>` from a clean machine (requires pushing to GitHub)
+- `${BIGQUERY_PROJECT}` expansion inside TOML prompt strings (needs BQ extension for end-to-end test)
+- Full profiling with live BQ tool execution (needs BQ Data Analytics extension installed)
+
+## 9. Round 3 — Time Series & Forecast (pending)
 
 Needs time-series data to test:
 - `forecast` tool with real temporal data
