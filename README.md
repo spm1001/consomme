@@ -5,8 +5,11 @@ BigQuery data analysis skill for AI coding agents. Takes messy data and produces
 ## Status
 
 **Robustness:** Beta — actively developed
+
 **Works with:** Claude Code, Gemini CLI, Amp
+
 **Install:** `gemini extensions install` (Gemini) or `./install.sh` (Claude Code / Amp)
+
 **Requires:** GCP project with BigQuery API (or just a Google Sheet for light analysis)
 
 Combines:
