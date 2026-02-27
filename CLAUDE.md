@@ -4,10 +4,10 @@ BQ data analysis skill ("consommé") for Claude Code and Amp. Combines Google's 
 
 ## Skill Location
 
-The skill source lives at `skills/consomme/` in this repo. It's installed via symlink:
+The skill source lives at `skills/analysis/` in this repo. It's installed via symlink:
 
 ```
-~/.claude/skills/consomme → /home/modha/Repos/consomme/skills/consomme
+~/.claude/skills/consomme → /home/modha/Repos/consomme/skills/analysis
 ```
 
 Run `./install.sh` to create/verify symlinks. The symlink is what makes the skill loadable by Claude Code and Amp — editing the source files here updates the installed skill immediately.
@@ -24,8 +24,8 @@ Run `./install.sh` to create/verify symlinks. The symlink is what makes the skil
 
 | File | Purpose |
 |------|---------|
-| `skills/consomme/SKILL.md` | Main skill (352 lines, lint 100/100) |
-| `skills/consomme/references/` | 6 reference files (profiling, stats, SQL, dashboard) |
+| `skills/analysis/SKILL.md` | Main skill (352 lines, lint 100/100) |
+| `skills/analysis/references/` | 6 reference files (profiling, stats, SQL, dashboard) |
 | `TESTING.md` | Test plan and results (Rounds 1-2 complete) |
 | `test-data/ohid-datamap.md` | Survey codebook with value labels |
 | `.bon/` | Work tracking — `bon list` for outstanding items |

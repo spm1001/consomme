@@ -307,3 +307,6 @@ done
 echo ""
 echo -e "${YELLOW}NEXT STEP:${NC} Restart your AI agent to activate."
 echo ""
+echo "Or install via marketplace:"
+echo "  /plugin marketplace add spm1001/batterie-de-savoir"
+echo ""
