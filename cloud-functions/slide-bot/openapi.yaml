@@ -1,0 +1,49 @@
+openapi: 3.0.0
+info:
+  title: Generate Slide Deck API
+  description: API for generating an ITV-branded Google Slide deck from analytical insights.
+  version: 1.0.0
+servers:
+  - url: https://europe-west2-mit-consomme-test.cloudfunctions.net
+paths:
+  /generate-slide-deck:
+    post:
+      summary: Generate a Slide Deck
+      operationId: generateSlideDeck
+      description: Copies the ITV Golden Template and injects the provided title and bullet points into the first slide.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: The main finding or title for the slide.
+                bullets:
+                  type: array
+                  items:
+                    type: string
+                  description: An array of key insights or bullet points to support the title.
+              required:
+                - title
+      responses:
+        '200':
+          description: Slide deck generated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  url:
+                    type: string
+                    description: The Google Docs URL to view/edit the generated slide deck.
+                  presentationId:
+                    type: string
+        '400':
+          description: Invalid request payload.
+        '500':
+          description: Internal server error during generation.
