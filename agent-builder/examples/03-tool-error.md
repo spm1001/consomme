@@ -1,7 +1,7 @@
-# Example 3: Tool Error Handling
+# Example 3: Data Not Found
 
-**Display name:** Handling query errors gracefully
-**Description:** User asks about a non-existent table. Agent handles the error without hallucinating.
+**Display name:** Handling missing data gracefully
+**Description:** User asks about data that doesn't exist. Agent searches honestly and reports the gap.
 **Selection strategy:** Always select
 
 ---
@@ -9,45 +9,49 @@
 ## Action 1 — User input
 
 ```
-What are the viewing figures for Q4?
+What are the viewing figures for Love Island?
 ```
 
 ## Action 2 — Agent response
 
 ```
-I'll look for viewing data in the project. Let me check what tables are available.
+I'll check what data is available in this project.
 ```
 
 ## Action 3 — Tool use
 
 - **Tool:** BigQuery
-- **Action:** execute_sql
+- **Action:** executeQuery
 - **Tool input:**
 ```json
 {
-  "sql": "SELECT table_name FROM `mit-consomme-test.survey_data.INFORMATION_SCHEMA.TABLES`",
-  "project": "mit-consomme-test"
+  "sql": "SELECT table_name, table_type FROM `mit-consomme-test.survey_data.INFORMATION_SCHEMA.TABLES`"
 }
 ```
 - **Tool output:**
 ```json
 {
+  "columns": ["table_name", "table_type"],
   "rows": [
-    {"table_name": "ohid_survey_raw"}
+    {"table_name": "itv_mood_of_the_nation_2026_v1", "table_type": "BASE TABLE"},
+    {"table_name": "itv_mood_of_the_nation_2026_raw", "table_type": "EXTERNAL"},
+    {"table_name": "itv_mood_of_the_nation_2026_clean", "table_type": "VIEW"},
+    {"table_name": "ohid_survey_raw", "table_type": "BASE TABLE"}
   ],
-  "total_rows": 1
+  "totalRows": 4,
+  "jobId": "job-tables-002"
 }
 ```
 
 ## Action 4 — Agent response
 
 ```
-The only table available in this project is `ohid_survey_raw`, which is the OHID mental health survey — it doesn't contain viewing figures. I don't have access to viewing data in this project.
+This project contains the ITV Mood of the Nation 2026 survey and an OHID mental health survey — neither has viewing figures or programme-level data like Love Island ratings.
 
-If the viewing data lives in a different BigQuery project, let me know the project and dataset name and I can look there. Otherwise, is there something I can help you explore in the mental health survey data?
+Viewing data would typically live in a different BigQuery project with BARB or internal ITV analytics data. If you can tell me which project that's in, I can query it. Otherwise, is there something I can help with from the Mood of the Nation survey?
 ```
 
 ---
 
-**Summary:** User requested viewing data that doesn't exist in the project. Agent searched available tables, found only survey data, and honestly reported the limitation without making up an answer. Offered alternatives.
-**Conversation state:** OK
+**Summary:** User asked for Love Island viewing figures. Agent checked available tables, found only survey data, and honestly reported the limitation. Offered alternatives without making up an answer.
+**Conversation state:** FAILED

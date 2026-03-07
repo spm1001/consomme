@@ -1,7 +1,7 @@
-# Example 4: Drill-Down Follow-Up
+# Example 4: Gender Differences on Cost of Living Worry
 
-**Display name:** Drill down into age groups
-**Description:** User asks a follow-up question to break results down by demographic. Agent re-uses prior context.
+**Display name:** Gender breakdown of cost of living worry
+**Description:** User asks a follow-up to compare gender differences on the top worry topic.
 **Selection strategy:** Always select
 
 ---
@@ -9,60 +9,78 @@
 ## Action 1 — User input
 
 ```
-Can you break the support access score down by age group?
+How does cost of living worry differ between men and women?
 ```
 
 ## Action 2 — Agent response
 
 ```
-I'll cross-tabulate the support access score (Q14) by age group (S1), with confidence intervals to check whether age differences are meaningful.
+I'll pull the full breakdown of B1 (cost of living worry) by gender, including the component responses not just the net score.
 ```
 
 ## Action 3 — Tool use
 
 - **Tool:** BigQuery
-- **Action:** execute_sql
+- **Action:** executeQuery
 - **Tool input:**
 ```json
 {
-  "sql": "SELECT S1 AS age_group_code, COUNT(*) AS n, ROUND(AVG(Q14), 2) AS avg_support_access, ROUND(AVG(Q14) - 1.96 * STDDEV(Q14) / SQRT(COUNT(*)), 2) AS ci_lower, ROUND(AVG(Q14) + 1.96 * STDDEV(Q14) / SQRT(COUNT(*)), 2) AS ci_upper FROM `mit-consomme-test.survey_data.ohid_survey_raw` WHERE S1 IS NOT NULL AND Q14 BETWEEN 1 AND 5 GROUP BY S1 HAVING COUNT(*) >= 30 ORDER BY avg_support_access ASC",
-  "project": "mit-consomme-test"
+  "sql": "SELECT segment_value, label, pct, base_n FROM `mit-consomme-test.survey_data.itv_mood_of_the_nation_2026_v1` WHERE question_code = 'B1' AND segment IN ('total', 'gender') AND NOT is_net ORDER BY segment_value, label_order"
 }
 ```
 - **Tool output:**
 ```json
 {
+  "columns": ["segment_value", "label", "pct", "base_n"],
   "rows": [
-    {"age_group_code": 1, "n": 210, "avg_support_access": 2.72, "ci_lower": 2.58, "ci_upper": 2.86},
-    {"age_group_code": 2, "n": 345, "avg_support_access": 2.95, "ci_lower": 2.84, "ci_upper": 3.06},
-    {"age_group_code": 3, "n": 298, "avg_support_access": 3.11, "ci_lower": 2.99, "ci_upper": 3.23},
-    {"age_group_code": 4, "n": 255, "avg_support_access": 3.18, "ci_lower": 3.05, "ci_upper": 3.31},
-    {"age_group_code": 5, "n": 147, "avg_support_access": 3.25, "ci_lower": 3.08, "ci_upper": 3.42}
+    {"segment_value": "Female", "label": "Very worried", "pct": 0.28, "base_n": 1152},
+    {"segment_value": "Female", "label": "Fairly worried", "pct": 0.38, "base_n": 1152},
+    {"segment_value": "Female", "label": "Not very worried", "pct": 0.22, "base_n": 1152},
+    {"segment_value": "Female", "label": "Not at all worried", "pct": 0.08, "base_n": 1152},
+    {"segment_value": "Female", "label": "Don't know", "pct": 0.04, "base_n": 1152},
+    {"segment_value": "Male", "label": "Very worried", "pct": 0.20, "base_n": 1097},
+    {"segment_value": "Male", "label": "Fairly worried", "pct": 0.34, "base_n": 1097},
+    {"segment_value": "Male", "label": "Not very worried", "pct": 0.29, "base_n": 1097},
+    {"segment_value": "Male", "label": "Not at all worried", "pct": 0.13, "base_n": 1097},
+    {"segment_value": "Male", "label": "Don't know", "pct": 0.04, "base_n": 1097},
+    {"segment_value": "Total", "label": "Very worried", "pct": 0.24, "base_n": 2249},
+    {"segment_value": "Total", "label": "Fairly worried", "pct": 0.36, "base_n": 2249},
+    {"segment_value": "Total", "label": "Not very worried", "pct": 0.26, "base_n": 2249},
+    {"segment_value": "Total", "label": "Not at all worried", "pct": 0.10, "base_n": 2249},
+    {"segment_value": "Total", "label": "Don't know", "pct": 0.04, "base_n": 2249}
   ],
-  "total_rows": 5
+  "totalRows": 15,
+  "jobId": "job-gender-worry-001"
 }
 ```
 
-## Action 4 — Agent response
+## Action 4 — Playbook invocation
+
+- **Playbook:** Validation
+- **Playbook state:** OK
+- **Preceding conversation summary:** Cost of living worry (B1) by gender. Female n=1,152, Male n=1,097 — both large bases. Women show higher "Very worried" (28% vs 20%). Need to check percentages sum correctly.
+- **Execution summary:** Validation passed. Percentages sum to ~100% for each segment (rounding). Gender base sizes are adequate. The 8pp gap on "Very worried" is the key finding.
+
+## Action 5 — Agent response
 
 ```
-Clear age gradient: the youngest group (code 1) scores lowest at 2.72, and it rises steadily to 3.25 for the oldest group. The confidence intervals for the youngest and oldest groups don't overlap, so this is a real difference. Let me generate the slide.
+Women are notably more worried about the cost of living. The "Very worried" category is 28% for women vs 20% for men — an 8 percentage point gap. Let me generate the slide.
 ```
 
-## Action 5 — Tool use
+## Action 6 — Tool use
 
 - **Tool:** Generate_Slide_Deck
 - **Action:** generateSlideDeck
 - **Tool input:**
 ```json
 {
-  "title": "Younger Respondents Report Significantly Worse Access to Mental Health Support",
+  "title": "Women Are Significantly More Worried About the Cost of Living Than Men",
   "bullets": [
-    "Youngest age group (code 1) scores 2.7/5 for support access — lowest of all groups (95% CI: 2.58-2.86, n=210)",
-    "Clear age gradient: scores rise steadily from 2.7 to 3.3 across 5 age groups",
-    "Youngest vs oldest group difference is statistically significant (CIs do not overlap)",
-    "All 5 age groups have adequate sample sizes (n=147 to n=345)",
-    "Age group codes not decoded — provide datamap for labels. Source: OHID Mental Health Survey."
+    "28% of women are 'Very worried' about cost of living vs 20% of men (+8 percentage points)",
+    "Net worry (Very + Fairly worried): women 66% vs men 54% — a 12pp gender gap",
+    "Men are more likely to say 'Not very worried' (29% vs 22%) or 'Not at all worried' (13% vs 8%)",
+    "Both genders have large base sizes (women n=1,152, men n=1,097) — differences are robust",
+    "Source: ITV Mood of the Nation 2026 (Q.B1), n=2,249 UK adults 18+."
   ]
 }
 ```
@@ -75,18 +93,17 @@ Clear age gradient: the youngest group (code 1) scores lowest at 2.72, and it ri
 }
 ```
 
-## Action 6 — Agent response
+## Action 7 — Agent response
 
 ```
-There's a clear age gradient: younger respondents report significantly worse access to mental health support. The youngest group scores 2.7 out of 5, rising steadily to 3.3 for the oldest.
+Women are carrying more financial anxiety — two-thirds (66%) are worried about the cost of living compared to just over half (54%) of men. The gap is strongest at the "Very worried" end.
 
 View the slide deck: https://docs.google.com/presentation/d/3pqr456stu789/edit
 
-This could be an important finding — younger staff may need targeted support. Would you like to combine age and region to see if the pattern holds across all areas?
+Would you like to see this by generation as well, or look at a different worry topic?
 ```
 
 ---
 
-**Summary:** Broke down support access scores by age group. Found a statistically significant age gradient — youngest respondents score lowest. Generated slide deck with confidence intervals.
+**Summary:** Compared cost of living worry by gender. Women are 12pp more worried overall (66% vs 54%), with the sharpest gap at "Very worried" (28% vs 20%). Generated slide deck.
 **Conversation state:** OK
-**Output parameters:** slide_url = https://docs.google.com/presentation/d/3pqr456stu789/edit
