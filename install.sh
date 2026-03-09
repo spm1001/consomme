@@ -283,7 +283,7 @@ if command -v gemini &>/dev/null; then
 
     echo ""
     warn "BQ tools require the Google BQ Data Analytics extension:"
-    echo "  gemini extensions install googlecloudplatform/bq-data-analytics"
+    echo "  gemini extensions install https://github.com/gemini-cli-extensions/bigquery-data-analytics"
 else
     echo ""
     warn "Gemini CLI not found — skipping extension link"

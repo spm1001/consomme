@@ -3,7 +3,7 @@
 ## Prerequisites
 
 This extension provides **methodology only**. You also need the BQ MCP tools.
-Install: `gemini extensions install googlecloudplatform/bq-data-analytics`
+Install: `gemini extensions install https://github.com/gemini-cli-extensions/bigquery-data-analytics`
 
 If BQ tool calls fail with "tool not found", the BQ Data Analytics extension is missing.
 
@@ -14,28 +14,28 @@ If BQ tool calls fail with "tool not found", the BQ Data Analytics extension is 
 
 ## Methodology
 
-@./skills/consomme/SKILL.md
+@./skills/analysis/SKILL.md
 
 ## Reference: SQL Patterns
 
-@./skills/consomme/references/sql-reference.md
+@./skills/analysis/references/sql-reference.md
 
 ## Reference: Statistical Analysis
 
-@./skills/consomme/references/statistical-analysis.md
+@./skills/analysis/references/statistical-analysis.md
 
 ## Reference: Survey Profiling
 
-@./skills/consomme/references/profiling-survey.md
+@./skills/analysis/references/profiling-survey.md
 
 ## Reference: Time Series Profiling
 
-@./skills/consomme/references/profiling-timeseries.md
+@./skills/analysis/references/profiling-timeseries.md
 
 ## Reference: Warehouse Profiling
 
-@./skills/consomme/references/profiling-warehouse.md
+@./skills/analysis/references/profiling-warehouse.md
 
 ## Reference: Dashboard Patterns
 
-@./skills/consomme/references/dashboard-patterns.md
+@./skills/analysis/references/dashboard-patterns.md
