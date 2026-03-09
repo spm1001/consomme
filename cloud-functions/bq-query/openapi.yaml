@@ -25,7 +25,7 @@ paths:
                   type: string
                   description: |
                     The BigQuery SQL query to execute. Must use fully-qualified table names
-                    (e.g. `mit-consomme-test.survey_data.ohid_survey_raw`). Supports all BigQuery
+                    (e.g. `mit-consomme-test.survey_data.itv_mood_of_the_nation_2026_v1`). Supports all BigQuery
                     SQL features including aggregations, window functions, CTEs, and INFORMATION_SCHEMA queries.
               required:
                 - sql
@@ -42,11 +42,9 @@ paths:
                     items:
                       type: string
                     description: Column names from the query result.
-                  rows:
-                    type: array
-                    items:
-                      type: object
-                    description: Array of row objects, each with column names as keys.
+                  data:
+                    type: string
+                    description: Query results as a markdown table. Each row is a pipe-delimited line. Use this field to read the data.
                   totalRows:
                     type: integer
                     description: Number of rows returned.

@@ -78,9 +78,26 @@ def execute_query(request):
         for row in results:
             rows.append({col: _serialize(row[col]) for col in columns})
 
+        # Build a markdown table for Agent Builder (which strips dynamic JSON keys)
+        # Cap to stay within Agent Builder's 8192 token output limit (~4 chars/token)
+        MAX_DATA_CHARS = 1500
+        md_lines = ["| " + " | ".join(columns) + " |"]
+        md_lines.append("| " + " | ".join(["---"] * len(columns)) + " |")
+        truncated = False
+        for row in rows:
+            line = "| " + " | ".join(str(row.get(c, "")) for c in columns) + " |"
+            if sum(len(l) for l in md_lines) + len(line) + len(md_lines) > MAX_DATA_CHARS:
+                truncated = True
+                break
+            md_lines.append(line)
+        if truncated:
+            shown = len(md_lines) - 2  # minus header + separator
+            md_lines.append(f"| ... truncated ({shown} of {len(rows)} rows shown — add LIMIT or narrow WHERE to see all) |")
+        data_table = "\n".join(md_lines)
+
         return (json.dumps({
             "columns": columns,
-            "rows": rows,
+            "data": data_table,
             "totalRows": len(rows),
             "jobId": query_job.job_id,
         }), 200, headers)
