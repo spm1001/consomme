@@ -26,7 +26,7 @@ Run `./install.sh` to create/verify symlinks. The symlink is what makes the skil
 |------|---------|
 | `skills/analysis/SKILL.md` | Main skill (352 lines, lint 100/100) |
 | `skills/analysis/references/` | 6 reference files (profiling, stats, SQL, dashboard) |
-| `TESTING.md` | Test plan and results (Rounds 1-2 complete) |
+| `docs/TESTING.md` | Test plan and results (Rounds 1-2 complete) |
 | `test-data/ohid-datamap.md` | Survey codebook with value labels |
 | `.bon/` | Work tracking — `bon list` for outstanding items |
 
