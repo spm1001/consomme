@@ -1,7 +1,9 @@
-description = "Build a Chart.js HTML dashboard from BigQuery data"
+---
+description: "Build a Chart.js HTML dashboard from BigQuery data"
+argument-hint: "[query or context]"
+---
 
-prompt = """
-Build an interactive HTML dashboard: {{args}}
+Build an interactive HTML dashboard: $ARGUMENTS
 
 Full consomme workflow:
 1. DISCOVER + UNDERSTAND: Identify and profile relevant tables
@@ -10,4 +12,3 @@ Full consomme workflow:
 4. PRESENT: Build self-contained Chart.js HTML following dashboard-patterns reference — KPI cards, appropriate chart types, filters, CSS design system, embedded data
 
 Save the dashboard as an HTML file.
-"""

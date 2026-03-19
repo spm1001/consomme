@@ -1,7 +1,9 @@
-description = "Orient to data analysis capabilities — what consomme can do, what data is available"
+---
+description: "Orient to data analysis capabilities — what consomme can do, what data is available"
+argument-hint: "[query or context]"
+---
 
-prompt = """
-The user wants to know what consomme can do or how to get started. {{args}}
+The user wants to know what consomme can do or how to get started. $ARGUMENTS
 
 Introduce consomme briefly, then offer practical next steps based on context:
 
@@ -24,4 +26,3 @@ Introduce consomme briefly, then offer practical next steps based on context:
 4. If the user mentioned a specific topic or question, suggest which command or approach fits best.
 
 Keep it concise — this is orientation, not a full analysis. End with a concrete suggestion for what to do next.
-"""

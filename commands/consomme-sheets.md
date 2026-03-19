@@ -1,7 +1,9 @@
-description = "Analyse a Google Sheet directly — no BigQuery needed. Paste a URL, get insights."
+---
+description: "Analyse a Google Sheet directly — no BigQuery needed. Paste a URL, get insights."
+argument-hint: "[query or context]"
+---
 
-prompt = """
-The user wants to analyse a Google Sheet without BigQuery: {{args}}
+The user wants to analyse a Google Sheet without BigQuery: $ARGUMENTS
 
 Follow this workflow:
 
@@ -39,4 +41,3 @@ Follow this workflow:
 IMPORTANT: You are analysing the data directly in context — do NOT generate SQL or reference BigQuery tools. Work with the CSV data as-is. Your analysis should be approximate but useful — "good enough for a first look" is the goal.
 
 If the mise fetch tool is not available, tell the user: "I need the mise MCP server to fetch Google Sheets. Ask your admin to configure it, or export the Sheet as CSV and share the file path instead."
-"""

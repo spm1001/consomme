@@ -1,6 +1,8 @@
-description = "Run QA checklist against the current analysis"
+---
+description: "Run QA checklist against the current analysis"
+argument-hint: "[query or context]"
+---
 
-prompt = """
 Run the consomme validation framework against our current analysis.
 
 Check every item:
@@ -10,4 +12,3 @@ Check every item:
 - Statistical validity: sample sizes (n >= 30), significance tested, multiple comparisons corrected
 
 For each: PASS, FAIL, or N/A with brief explanation. Overall assessment: ready to share, or what needs fixing.
-"""

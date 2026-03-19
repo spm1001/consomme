@@ -1,7 +1,9 @@
-description = "Explore a BigQuery project or dataset — list tables, catalog search"
+---
+description: "Explore a BigQuery project or dataset — list tables, catalog search"
+argument-hint: "[query or context]"
+---
 
-prompt = """
-Explore: {{args}}
+Explore: $ARGUMENTS
 
 Follow the consomme Discover stage:
 - Dataset specified → list_table_ids + get_dataset_info
@@ -9,4 +11,3 @@ Follow the consomme Discover stage:
 - Conceptual description → search_catalog with natural language
 
 For each interesting table, get a quick summary via get_table_info. Present as a structured inventory with row counts and brief schema summaries.
-"""

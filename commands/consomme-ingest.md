@@ -1,7 +1,9 @@
-description = "Turn a Google Sheet into a queryable BigQuery table — paste a URL, get a table"
+---
+description: "Turn a Google Sheet into a queryable BigQuery table — paste a URL, get a table"
+argument-hint: "[query or context]"
+---
 
-prompt = """
-The user wants to make a Google Sheet available as a BigQuery table: {{args}}
+The user wants to make a Google Sheet available as a BigQuery table: $ARGUMENTS
 
 TRIAGE FIRST: If the user just wants to explore a small Sheet (<5K rows) and doesn't need BigQuery specifically, suggest /consomme-sheets instead — it analyses directly with no BQ permissions needed. Only proceed with BQ ingestion if they need persistent querying, joins with other BQ data, or the dataset is large.
 
@@ -38,4 +40,3 @@ Guide them through this step by step:
 6. SUGGEST next steps: "Your data is ready. Try /consomme-profile project.dataset.table_name to understand the shape and quality."
 
 Keep the tone helpful and non-technical. The user may not know SQL or BQ concepts — explain what you're doing as you go.
-"""
