@@ -3,18 +3,18 @@
 ## 1. Installation (no BQ needed)
 
 ```bash
-# Install (Claude Code / Amp skill + Gemini extension)
-./install.sh
+# Install via plugin system
+claude plugin install spm1001/consomme
 
-# Verify
-./install.sh --verify
+# Or via marketplace
+/plugin marketplace add spm1001/batterie-de-savoir
 
-# Check locations
-ls -la ~/.claude/skills/consomme          # CC / Amp skill symlink
+# Gemini extension (if using Gemini CLI)
+gemini extensions link ~/Repos/consomme
 ls -la ~/.gemini/extensions/consomme      # Gemini extension (symlink for dev, copy for install)
 ```
 
-✅ Claude Code skill symlink points to `skills/consomme` in this repo.
+✅ Plugin installed and visible in `claude plugin list`.
 ✅ Gemini extension linked/installed at `~/.gemini/extensions/consomme`.
 
 ## 2. Skill loads in agent
@@ -119,10 +119,10 @@ Run these in Gemini CLI, one at a time. Each tests a different stage of the work
 
 ```bash
 # Structure lint (target: 85+)
-python3 ~/.claude/skills/skill-forge/scripts/lint_skill.py skills/consomme
+skill-forge lint skills/consomme
 
 # Description quality (target: 70+)
-python3 ~/.claude/skills/skill-forge/scripts/score_description.py skills/consomme
+skill-forge score skills/consomme
 ```
 
 Current scores: Lint 99/100, CSO 79/100.

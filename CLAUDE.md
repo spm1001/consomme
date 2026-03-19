@@ -4,13 +4,13 @@ BQ data analysis skill ("consommé") for Claude Code and Amp. Combines Google's 
 
 ## Skill Location
 
-The skill source lives at `skills/analysis/` in this repo. It's installed via symlink:
+The skill source lives at `skills/analysis/` in this repo. It's installed via the plugin system:
 
-```
-~/.claude/skills/consomme → /home/modha/Repos/consomme/skills/analysis
+```bash
+claude plugin install spm1001/consomme
 ```
 
-Run `./install.sh` to create/verify symlinks. The symlink is what makes the skill loadable by Claude Code and Amp — editing the source files here updates the installed skill immediately.
+For local development, the plugin resolves to this repo. Editing the source files here updates the installed skill immediately.
 
 ## Test Data
 
