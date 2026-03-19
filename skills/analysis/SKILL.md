@@ -1,6 +1,7 @@
 ---
 name: consomme
 description: BigQuery data analysis — BEFORE writing any BQ query, load this for methodology and dialect reference. Provides 5-stage workflow (discover → understand → analyse → validate → present) mapped to MCP tools (execute_sql, forecast, analyze_contribution, catalog search). Triggers on 'analyse this data', 'explore the dataset', 'what tables do we have', 'build a dashboard', 'query BigQuery', 'why did this metric change'. (user)
+allowed-tools: [Bash, Read, Write, "mcp__*"]
 ---
 
 <!-- Sources: Google BQ Data Analytics extension (Apache-2.0), Anthropic knowledge-work-plugins (Apache-2.0) -->
