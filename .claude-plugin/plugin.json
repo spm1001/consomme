@@ -1,6 +1,6 @@
 {
   "name": "consomme",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "BigQuery data analysis methodology \u2014 5-stage workflow from discovery to presentation. Requires: Google BQ MCP extension",
   "author": {
     "name": "Sameer Modha",
