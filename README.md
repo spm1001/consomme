@@ -1,12 +1,12 @@
 # consommé
 
+> **Archived.** The consomme skill has been absorbed into [trousse](https://github.com/spm1001/trousse) (v0.5.0). Install trousse to get consomme. Cloud functions in this repo remain deployed.
+
 BigQuery data analysis skill for AI coding agents. Takes messy data and produces crystal-clear insights — the technique does the work, not the person.
 
 ## Status
 
-**Robustness:** Beta — actively developed
-
-**Works with:** Claude Code, Gemini CLI, Amp
+**Archived** — skill now lives in [trousse/skills/consomme](https://github.com/spm1001/trousse/tree/main/skills/consomme)
 
 **Install:** `gemini extensions install` (Gemini) or `./install.sh` (Claude Code / Amp)
 
